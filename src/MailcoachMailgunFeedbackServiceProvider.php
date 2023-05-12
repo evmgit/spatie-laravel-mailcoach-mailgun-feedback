@@ -11,7 +11,7 @@ class MailcoachMailgunFeedbackServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        Route::macro('mailgunFeedback', fn (string $url) => Route::post("{$url}/{mailerConfigKey?}", '\\' . MailgunWebhookController::class));
+        Route::macro('mailgunFeedback', fn (string $url) => Route::post($url, '\\' . MailgunWebhookController::class));
 
         Event::listen(MessageSent::class, StoreTransportMessageId::class);
     }

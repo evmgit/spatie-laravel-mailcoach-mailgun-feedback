@@ -5,22 +5,19 @@ namespace Spatie\MailcoachMailgunFeedback;
 use Illuminate\Support\Arr;
 use Spatie\Mailcoach\Domain\Campaign\Events\WebhookCallProcessedEvent;
 use Spatie\Mailcoach\Domain\Shared\Models\Send;
-use Spatie\Mailcoach\Domain\Shared\Traits\UsesMailcoachModels;
-use Spatie\Mailcoach\Mailcoach;
-use Spatie\WebhookClient\Jobs\ProcessWebhookJob;
+use Spatie\Mailcoach\Domain\Shared\Support\Config;
 use Spatie\WebhookClient\Models\WebhookCall;
+use Spatie\WebhookClient\ProcessWebhookJob;
 
 class ProcessMailgunWebhookJob extends ProcessWebhookJob
 {
-    use UsesMailcoachModels;
-
     public function __construct(WebhookCall $webhookCall)
     {
         parent::__construct($webhookCall);
 
         $this->queue = config('mailcoach.campaigns.perform_on_queue.process_feedback_job');
 
-        $this->connection = $this->connection ?? Mailcoach::getQueueConnection();
+        $this->connection = $this->connection ?? Config::getQueueConnection();
     }
 
     public function handle()
@@ -43,9 +40,6 @@ class ProcessMailgunWebhookJob extends ProcessWebhookJob
             return null;
         }
 
-        /** @var class-string<Send> $sendClass */
-        $sendClass = $this->getSendClass();
-
-        return $sendClass::findByTransportMessageId($messageId);
+        return Send::findByTransportMessageId($messageId);
     }
 }
